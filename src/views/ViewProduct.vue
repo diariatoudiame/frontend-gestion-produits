@@ -18,8 +18,8 @@
           <div class="user-profile">
             <img src="https://via.placeholder.com/40" alt="User Profile" />
             <div class="user-info" v-if="!sidebarCollapsed">
-              <span class="user-name">Jean Dupont</span>
-              <span class="user-role">Administrateur</span>
+              <span class="user-name">{{ currentUser?.name || 'Non connecté' }}</span>
+              <span class="user-role">{{ currentUser?.role || 'Invité' }}</span>
             </div>
           </div>
         </div>
@@ -171,6 +171,7 @@
 <script>
 import SidebarComponent from '@/components/SideBar.vue';
 import ProductService from '@/services/product.service';
+import AuthService from "@/services/auth.service";
 
 export default {
   name: 'ProductDetail',
@@ -184,7 +185,9 @@ export default {
       error: null,
       sidebarCollapsed: false,
       showDeleteModal: false,
-      deleteLoading: false
+      deleteLoading: false,
+      currentUser: null
+
     };
   },
   computed: {
@@ -200,8 +203,21 @@ export default {
   },
   created() {
     this.fetchProductDetails();
+    this.fetchCurrentUser();
+
   },
   methods: {
+    fetchCurrentUser() {
+      // Récupérer l'utilisateur depuis le AuthService
+      this.currentUser = AuthService.getCurrentUser();
+
+      // Si aucun utilisateur n'est connecté et que l'accès à cette page nécessite une authentification,
+      // rediriger vers la page de connexion
+      if (!this.currentUser && this.$route.meta.requiresAuth) {
+        this.$router.push('/login');
+      }
+    },
+
     async fetchProductDetails() {
       this.loading = true;
       this.error = null;

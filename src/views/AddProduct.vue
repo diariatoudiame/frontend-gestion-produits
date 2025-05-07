@@ -16,10 +16,10 @@
             <span class="badge">3</span>
           </div>
           <div class="user-profile">
-            <img src="https://via.placeholder.com/40" alt="User Profile" />
+            <img :src="userAvatar" :alt="currentUser?.name || 'Utilisateur'" />
             <div class="user-info" v-if="!sidebarCollapsed">
-              <span class="user-name">Jean Dupont</span>
-              <span class="user-role">Administrateur</span>
+              <span class="user-name">{{ currentUser?.name || 'Non connecté' }}</span>
+              <span class="user-role">{{ currentUser?.role || 'Invité' }}</span>
             </div>
           </div>
         </div>
@@ -196,6 +196,7 @@
 <script>
 import SidebarComponent from '@/components/SideBar.vue';
 import ProductService from '@/services/product.service';
+import AuthService from '@/services/auth.service';
 
 export default {
   name: 'AddProduct',
@@ -217,7 +218,8 @@ export default {
       success: null,
       imagePreview: null,
       imageFileName: '',
-      sidebarCollapsed: false
+      sidebarCollapsed: false,
+      currentUser: null
     };
   },
   computed: {
@@ -225,9 +227,28 @@ export default {
       return this.product.name &&
           this.product.price !== null &&
           this.product.quantity !== null;
+    },
+    userAvatar() {
+      // Si l'utilisateur a une photo de profil, l'utiliser, sinon utiliser une image de placeholder
+      return this.currentUser?.avatar || 'https://via.placeholder.com/40';
     }
   },
+  created() {
+    // Récupérer l'utilisateur connecté lors de la création du composant
+    this.fetchCurrentUser();
+  },
   methods: {
+    fetchCurrentUser() {
+      // Récupérer l'utilisateur depuis le AuthService
+      this.currentUser = AuthService.getCurrentUser();
+
+      // Si aucun utilisateur n'est connecté et que l'accès à cette page nécessite une authentification,
+      // rediriger vers la page de connexion
+      if (!this.currentUser && this.$route.meta.requiresAuth) {
+        this.$router.push('/login');
+      }
+    },
+
     async addProduct() {
       if (!this.formValid) {
         return;
@@ -252,6 +273,11 @@ export default {
         // Ajout de l'image si elle existe
         if (this.$refs.imageInput.files[0]) {
           formData.append('image', this.$refs.imageInput.files[0]);
+        }
+
+        // Ajout de l'ID de l'utilisateur qui crée le produit
+        if (this.currentUser && this.currentUser.id) {
+          formData.append('created_by', this.currentUser.id);
         }
 
         // Appel au service pour ajouter le produit
@@ -318,6 +344,7 @@ export default {
 </script>
 
 <style scoped>
+/* Les styles restent inchangés */
 /* Variables CSS pour les couleurs */
 :root {
   --primary-color: #4caf50;

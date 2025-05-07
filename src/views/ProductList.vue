@@ -29,8 +29,8 @@
           <div class="user-profile">
             <img src="https://via.placeholder.com/40" alt="User Profile" />
             <div class="user-info" v-if="!sidebarCollapsed">
-              <span class="user-name">Jean Dupont</span>
-              <span class="user-role">Administrateur</span>
+              <span class="user-name">{{ currentUser?.name || 'Non connecté' }}</span>
+              <span class="user-role">{{ currentUser?.role || 'Invité' }}</span>
             </div>
           </div>
         </div>
@@ -103,7 +103,7 @@
                 Stock
                 <i class="fas" :class="getSortIconClass('quantity')"></i>
               </th>
-              <th>Statut</th>
+
               <th @click="sortBy('created_at')">
                 Date d'ajout
                 <i class="fas" :class="getSortIconClass('created_at')"></i>
@@ -139,11 +139,7 @@
                   {{ getStockStatus(product.quantity) }}
                 </div>
               </td>
-              <td>
-                <div class="status-badge" :class="product.active ? 'active' : 'inactive'">
-                  {{ product.active ? 'Actif' : 'Inactif' }}
-                </div>
-              </td>
+
               <td>{{ formatDate(product.created_at) }}</td>
               <td>
                 <div class="action-buttons">
@@ -241,6 +237,7 @@
 <script>
 import ProductService from '@/services/product.service';
 import SideBar from '@/components/SideBar.vue';
+import AuthService from "@/services/auth.service";
 
 export default {
   name: 'ProductList',
@@ -263,7 +260,8 @@ export default {
       selectAll: false,
       sidebarCollapsed: false,
       showDeleteModal: false,
-      productToDelete: null
+      productToDelete: null,
+      currentUser: null
     };
   },
   computed: {
@@ -285,8 +283,21 @@ export default {
   },
   mounted() {
     this.loadProducts();
+    this.fetchCurrentUser();
   },
   methods: {
+    fetchCurrentUser() {
+      // Récupérer l'utilisateur depuis le AuthService
+      this.currentUser = AuthService.getCurrentUser();
+
+      // Si aucun utilisateur n'est connecté et que l'accès à cette page nécessite une authentification,
+      // rediriger vers la page de connexion
+      if (!this.currentUser && this.$route.meta.requiresAuth) {
+        this.$router.push('/login');
+      }
+    },
+
+
     async loadProducts() {
       this.loading = true;
       this.error = null;

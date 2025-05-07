@@ -40,15 +40,7 @@ class AuthService {
         return user && user.role === 'admin';
     }
 
-    // Nouvelle méthode à ajouter pour vérifier l'existence d'un email
-    checkEmailExists(email) {
-        return api.post('/check-email', { email })
-            .then(response => response.data)
-            .catch(error => {
-                console.error('Error checking email:', error);
-                throw error;
-            });
-    }
+
 }
 
 export default new AuthService();
