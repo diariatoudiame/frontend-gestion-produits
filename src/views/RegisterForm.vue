@@ -123,7 +123,7 @@
         </form>
 
         <div class="register-footer">
-          <p>Vous avez déjà un compte ? <a href="#" @click.prevent="goToLogin" class="login-link">Connectez-vous</a></p>
+          <p>Vous avez déjà un compte ? <a href="/login" @click.prevent="goToLogin" class="login-link">Connectez-vous</a></p>
         </div>
       </div>
     </div>

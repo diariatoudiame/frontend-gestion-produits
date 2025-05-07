@@ -1,4 +1,3 @@
-
 <template>
   <div class="sidebar" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
     <div class="sidebar-header">
@@ -19,7 +18,7 @@
     </div>
 
     <div class="sidebar-footer">
-      <div class="menu-item">
+      <div class="menu-item" @click="handleLogout">
         <i class="fas fa-sign-out-alt"></i>
         <span v-if="!sidebarCollapsed">Déconnexion</span>
       </div>
@@ -28,6 +27,8 @@
 </template>
 
 <script>
+import AuthService from '@/services/auth.service'; // Importez votre service d'authentification
+
 export default {
   name: 'SidebarComponent',
   props: {
@@ -45,6 +46,16 @@ export default {
     toggleSidebar() {
       this.sidebarCollapsed = !this.sidebarCollapsed;
       this.$emit('sidebar-toggle', this.sidebarCollapsed);
+    },
+    handleLogout() {
+      AuthService.logout()
+          .then(() => {
+            // Rediriger vers la page de connexion après déconnexion
+            this.$router.push('/login');
+          })
+          .catch(error => {
+            console.error('Erreur lors de la déconnexion:', error);
+          });
     }
   },
   watch: {
@@ -125,6 +136,7 @@ export default {
   text-decoration: none;
   transition: all 0.3s;
   margin-bottom: 5px;
+  cursor: pointer; /* Ajout du curseur pointer pour indiquer que c'est cliquable */
 }
 
 .sidebar-collapsed .menu-item {

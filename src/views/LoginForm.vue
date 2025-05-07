@@ -68,7 +68,7 @@
         </form>
 
         <div class="login-footer">
-          <p>Vous n'avez pas de compte ? <a href="#" class="register-link">Inscrivez-vous</a></p>
+          <p>Vous n'avez pas de compte ? <a href="/register" class="register-link">Inscrivez-vous</a></p>
         </div>
       </div>
     </div>
