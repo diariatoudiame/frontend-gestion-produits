@@ -117,7 +117,7 @@ export default {
         if (response.user.role === 'admin') {
           this.$router.push('/');
         } else {
-          this.$router.push('/produits');
+          this.$router.push('/');
         }
       } catch (err) {
         console.error('Erreur de connexion:', err);
